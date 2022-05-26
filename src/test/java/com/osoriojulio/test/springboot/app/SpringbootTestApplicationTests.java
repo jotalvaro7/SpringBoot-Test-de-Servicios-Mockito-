@@ -14,23 +14,40 @@ import org.junit.jupiter.api.Test;
 import static com.osoriojulio.test.springboot.app.Datos.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
 
 
 @SpringBootTest
 class SpringbootTestApplicationTests {
+	//1 forma
+//	@Mock
+//	CuentaRepository cuentaRepository;
+//	@Mock
+//	BancoRepository bancoRepository;
+//
+//	@InjectMocks
+//	CuentaServiceImpl service;
 
-	static CuentaRepository cuentaRepository;
-	static BancoRepository bancoRepository;
-	static CuentaService service;
+	//2 forma usando anotaciones de spring
+	@MockBean
+	CuentaRepository cuentaRepository;
+	@MockBean
+	BancoRepository bancoRepository;
+	@Autowired
+	CuentaService service;
 
 	@BeforeEach
 	void setup() {
-		cuentaRepository = mock(CuentaRepository.class);
-		bancoRepository = mock(BancoRepository.class);
-		service = new CuentaServiceImpl(cuentaRepository, bancoRepository);
+//		cuentaRepository = mock(CuentaRepository.class);
+//		bancoRepository = mock(BancoRepository.class);
+//		service = new CuentaServiceImpl(cuentaRepository, bancoRepository);
 	}
 
 	@Test
