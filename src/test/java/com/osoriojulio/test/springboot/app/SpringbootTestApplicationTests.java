@@ -1,5 +1,7 @@
 package com.osoriojulio.test.springboot.app;
 
+import com.osoriojulio.test.springboot.app.models.Banco;
+import com.osoriojulio.test.springboot.app.models.Cuenta;
 import com.osoriojulio.test.springboot.app.repositories.BancoRepository;
 import com.osoriojulio.test.springboot.app.repositories.CuentaRepository;
 import com.osoriojulio.test.springboot.app.services.CuentaService;
@@ -46,6 +48,17 @@ class SpringbootTestApplicationTests {
 
 		assertEquals("900", saldoOrigen.toPlainString());
 		assertEquals("2100", saldoDestino.toPlainString());
+
+
+		int totalTransferencias = service.revisarTotalTransferencias(1L);
+		assertEquals(1, totalTransferencias);
+
+		verify(cuentaRepository, times(3)).findById(1L);
+		verify(cuentaRepository, times(3)).findById(2L);
+		verify(cuentaRepository, times(2)).update(any(Cuenta.class));
+
+		verify(bancoRepository).findById(2L);
+		verify(bancoRepository).update(any(Banco.class));
 
 	}
 
