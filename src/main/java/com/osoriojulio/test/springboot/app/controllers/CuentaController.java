@@ -5,6 +5,8 @@ import static org.springframework.http.HttpStatus.*;
 import com.osoriojulio.test.springboot.app.models.Cuenta;
 import com.osoriojulio.test.springboot.app.models.TransaccionDto;
 import com.osoriojulio.test.springboot.app.services.CuentaService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +17,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/cuentas")
+@Api(tags = {"Controlador Cuenta"})
 public class CuentaController {
 
     @Autowired
@@ -22,11 +25,13 @@ public class CuentaController {
 
     @GetMapping("/{id}")
     @ResponseStatus(OK)
+    @ApiOperation("Obtener el detalle  de la cuenta")
     public Cuenta detalle(@PathVariable Long id){
         return cuentaService.findById(id);
     }
 
     @PostMapping("/transferir")
+    @ApiOperation("Transferir a una cuenta")
     public ResponseEntity<?> transferir(@RequestBody TransaccionDto dto){
         cuentaService.transferir(dto.getCuentaOrigenId(), dto.getCuentaDestinoId(), dto.getMonto(), dto.getBancoId());
 
