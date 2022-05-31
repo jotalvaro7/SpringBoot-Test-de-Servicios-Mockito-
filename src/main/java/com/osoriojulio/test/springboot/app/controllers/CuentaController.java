@@ -40,7 +40,7 @@ public class CuentaController {
     @PostMapping
     @ResponseStatus(CREATED)
     public Cuenta guardar(@RequestBody Cuenta cuenta){
-        return null;
+        return cuentaService.save(cuenta);
     }
 
     @PostMapping("/transferir")

@@ -93,7 +93,7 @@ class CuentaControllerTest {
 
         //when
         mockMvc.perform(get("/api/cuentas")
-                .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].persona").value("Andres"))
                 .andExpect(jsonPath("$[1].persona").value("Julio"))
@@ -101,5 +101,28 @@ class CuentaControllerTest {
                 .andExpect(jsonPath("$[1].saldo").value("2000"))
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(content().json(objectMapper.writeValueAsString(cuentas)));
+
+        verify(cuentaService).findAll();
+
+    }
+
+    @Test
+    void testGuardar() throws Exception {
+        Cuenta cuenta = new Cuenta(null, "Pepe", new BigDecimal("3000"));
+        when(cuentaService.save(cuenta)).then(invocation -> {
+            Cuenta c = invocation.getArgument(0);
+            c.setId(3L);
+            return c;
+        });
+
+        mockMvc.perform(post("/api/cuentas")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(cuenta)))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id", is(3)))
+                .andExpect(jsonPath("$.persona", is("Pepe")))
+                .andExpect(jsonPath("$.saldo", is(3000)));
+
     }
 }
