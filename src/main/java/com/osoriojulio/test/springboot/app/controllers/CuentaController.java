@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -23,11 +24,23 @@ public class CuentaController {
     @Autowired
     private CuentaService cuentaService;
 
+    @GetMapping
+    @ResponseStatus(OK)
+    public List<Cuenta> listar(){
+        return cuentaService.findAll();
+    }
+
     @GetMapping("/{id}")
     @ResponseStatus(OK)
     @ApiOperation("Obtener el detalle  de la cuenta")
     public Cuenta detalle(@PathVariable Long id){
         return cuentaService.findById(id);
+    }
+
+    @PostMapping
+    @ResponseStatus(CREATED)
+    public Cuenta guardar(@RequestBody Cuenta cuenta){
+        return null;
     }
 
     @PostMapping("/transferir")
