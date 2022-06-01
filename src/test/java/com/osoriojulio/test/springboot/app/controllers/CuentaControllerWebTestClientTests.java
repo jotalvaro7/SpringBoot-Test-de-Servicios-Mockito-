@@ -46,10 +46,12 @@ class CuentaControllerWebTestClientTests {
         response.put("mensaje", "Transferencia realizada con exito");
         response.put("transaccion", dto);
 
-        client.post().uri("http://localhost:8080/api/cuentas/transferir")
+        //when
+        client.post().uri("/api/cuentas/transferir")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(dto)
                 .exchange()
+        //then
                 .expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$.mensaje").isNotEmpty()
