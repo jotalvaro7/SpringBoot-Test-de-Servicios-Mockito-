@@ -2,9 +2,9 @@ package com.osoriojulio.test.springboot.app.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.osoriojulio.test.springboot.app.models.Cuenta;
 import com.osoriojulio.test.springboot.app.models.TransaccionDto;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.HttpStatus.OK;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 class CuentaControllerWebTestClientTests {
 
@@ -33,10 +34,11 @@ class CuentaControllerWebTestClientTests {
     }
 
     @Test
+    @Order(1)
     void transferirTest() throws JsonProcessingException {
         TransaccionDto dto = new TransaccionDto();
-        dto.setCuentaDestinoId(1L);
-        dto.setCuentaOrigenId(2L);
+        dto.setCuentaOrigenId(1L);
+        dto.setCuentaDestinoId(2L);
         dto.setBancoId(1L);
         dto.setMonto(new BigDecimal("100"));
 
@@ -51,7 +53,7 @@ class CuentaControllerWebTestClientTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(dto)
                 .exchange()
-        //then
+                //then
                 .expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$.mensaje").isNotEmpty()
@@ -62,5 +64,34 @@ class CuentaControllerWebTestClientTests {
                 .jsonPath("$.transaccion.cuentaOrigenId").isEqualTo(dto.getCuentaOrigenId())
                 .jsonPath("$.date").isEqualTo(LocalDate.now().toString())
                 .json(objectMapper.writeValueAsString(response));
+    }
+
+    @Test
+    @Order(2)
+    void detalleTest() throws JsonProcessingException {
+
+        Cuenta cuenta = new Cuenta(1L, "Andres", new BigDecimal("900"));
+
+        client.get().uri("/api/cuentas/1").exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.persona").isEqualTo("Andres")
+                .jsonPath("$.saldo").isEqualTo(900)
+                .json(objectMapper.writeValueAsString(cuenta));
+    }
+
+    @Test
+    @Order(3)
+    void detalleTest2() {
+        client.get().uri("/api/cuentas/2").exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody(Cuenta.class)
+                .consumeWith(response -> {
+                    Cuenta cuenta = response.getResponseBody();
+                    assertEquals("Julio", cuenta.getPersona());
+                    assertEquals("2100.00", cuenta.getSaldo().toPlainString());
+                });
     }
 }
