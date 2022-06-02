@@ -10,7 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import javax.print.attribute.standard.Media;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -179,5 +178,29 @@ class CuentaControllerWebTestClientTests {
                     assertEquals("Pepa", c.getPersona());
                     assertEquals("3500", c.getSaldo().toPlainString());
                 });
+    }
+
+    @Test
+    @Order(8)
+    void testEliminar() {
+        client.get().uri("/api/cuentas")
+                .exchange()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBodyList(Cuenta.class)
+                .hasSize(2);
+
+        client.delete().uri("/api/cuentas/2")
+                .exchange()
+                .expectStatus().isNoContent()
+                .expectBody().isEmpty();
+
+        client.get().uri("/api/cuentas")
+                .exchange()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBodyList(Cuenta.class)
+                .hasSize(1);
+
+        client.get().uri("/api/cuentas/2").exchange()
+                .expectStatus().is5xxServerError();
     }
 }
