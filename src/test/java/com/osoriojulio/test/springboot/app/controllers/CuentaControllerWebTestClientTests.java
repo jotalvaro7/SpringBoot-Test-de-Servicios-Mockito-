@@ -201,6 +201,8 @@ class CuentaControllerWebTestClientTests {
                 .hasSize(1);
 
         client.get().uri("/api/cuentas/2").exchange()
-                .expectStatus().is5xxServerError();
+//                .expectStatus().is5xxServerError();
+                .expectStatus().isNotFound()
+                .expectBody().isEmpty();
     }
 }

@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/api/cuentas")
@@ -31,10 +32,15 @@ public class CuentaController {
     }
 
     @GetMapping("/{id}")
-    @ResponseStatus(OK)
     @ApiOperation("Obtener el detalle  de la cuenta")
-    public Cuenta detalle(@PathVariable Long id){
-        return cuentaService.findById(id);
+    public ResponseEntity<?> detalle(@PathVariable Long id){
+        Cuenta cuenta = null;
+        try{
+            cuenta = cuentaService.findById(id);
+        }catch (NoSuchElementException e){
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(cuenta);
     }
 
     @PostMapping
