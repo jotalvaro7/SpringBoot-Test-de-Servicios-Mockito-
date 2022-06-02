@@ -10,13 +10,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import javax.print.attribute.standard.Media;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -94,4 +98,43 @@ class CuentaControllerWebTestClientTests {
                     assertEquals("2100.00", cuenta.getSaldo().toPlainString());
                 });
     }
+
+    @Test
+    @Order(4)
+    void listarTest() {
+        client.get().uri("/api/cuentas").exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$[0].persona").isEqualTo("Andres")
+                .jsonPath("$[0].id").isEqualTo(1)
+                .jsonPath("$[0].saldo").isEqualTo(900)
+                .jsonPath("$[1].persona").isEqualTo("Julio")
+                .jsonPath("$[1].id").isEqualTo(2)
+                .jsonPath("$[1].saldo").isEqualTo(2100)
+                .jsonPath("$").isArray()
+                .jsonPath("$").value(hasSize(2));
+    }
+
+    //TODO: Otra forma de realizar la prueba anterior
+    @Test
+    @Order(5)
+    void listarTest2() {
+        client.get().uri("/api/cuentas").exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBodyList(Cuenta.class)
+                .consumeWith(response -> {
+                    List<Cuenta> cuentas = response.getResponseBody();
+                    assertNotNull(cuentas);
+                    assertEquals(2, cuentas.size());
+                    assertEquals(1L, cuentas.get(0).getId());
+                    assertEquals("Andres", cuentas.get(0).getPersona());
+                    assertEquals(900, cuentas.get(0).getSaldo().intValue());
+                    assertEquals(2L, cuentas.get(1).getId());
+                    assertEquals("Julio", cuentas.get(1).getPersona());
+                    assertEquals(2100, cuentas.get(1).getSaldo().intValue());
+                }).hasSize(2);
+    }
+
 }
